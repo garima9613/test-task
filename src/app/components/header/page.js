@@ -7,7 +7,7 @@ export default function Header() {
   return (
     <div className="flex items-center justify-between border-b border-gray-400 py-8">
       <a href="/">
-        <img src="https://designbygio.it/images/logo.png" alt="logo" />
+        <h1>TEST TASK</h1>
       </a>
       <nav>
         <section className="MOBILE-MENU flex lg:hidden">

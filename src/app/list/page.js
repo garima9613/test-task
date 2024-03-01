@@ -1,11 +1,49 @@
 "use client";
+import { gql } from "@apollo/client";
+import { useSuspenseQuery } from "@apollo/experimental-nextjs-app-support/ssr";
 import Header from "../components/header/page";
+import { useEffect, useState } from "react";
+import Pagination from "../components/pagination/page";
 
-export default function Page() {
+const query = gql`
+  query {
+    countries {
+      code
+      name
+    }
+  }
+`;
+
+export default function List() {
+  const [result, setResult] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [resultPerPage] = useState(10);
+  const { data } = useSuspenseQuery(query);
+
+  useEffect(() => {
+    setResult(data);
+    setLoading(false);
+  }, [data]);
+
+  // Get current result
+  const indexOfLastPost = currentPage * resultPerPage;
+  const indexOfFirstPost = indexOfLastPost - resultPerPage;
+  const currentResult = result?.countries?.slice(
+    indexOfFirstPost,
+    indexOfLastPost
+  );
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(result?.countries / resultPerPage); i++) {
+    pageNumbers.push(i);
+  }
+
   return (
     <div className="container mx-auto mb-8 px-8">
       <Header />
-
       <div className="mb-3 xl:w-96">
         <div className="relative mb-4 flex w-full flex-wrap items-stretch">
           <input
@@ -16,7 +54,8 @@ export default function Page() {
             aria-describedby="button-addon2"
           />
 
-          {/* <!--Search icon--> */}
+          {/* Search icon */}
+
           <span
             className="input-group-text flex items-center whitespace-nowrap rounded px-3 py-1.5 text-center text-base font-normal text-neutral-700 dark:text-neutral-200"
             id="basic-addon2"
@@ -37,23 +76,64 @@ export default function Page() {
         </div>
       </div>
 
-      <table class="shadow-lg bg-white border-collapse">
-        <tr>
-          <th class="bg-blue-100 border text-left px-8 py-4">Name</th>
-          <th class="bg-blue-100 border text-left px-8 py-4">Email</th>
-          <th class="bg-blue-100 border text-left px-8 py-4">Description</th>
-        </tr>
-        <tr class="hover:bg-gray-50">
-          <td class="border px-8 py-4">Alfreds Futterkiste</td>
-          <td class="border px-8 py-4">Dante Sparks</td>
-          <td class="border px-8 py-4">Italy</td>
-        </tr>
-        <tr class="hover:bg-gray-50">
-          <td class="border px-8 py-4">Alfreds Futterkiste</td>
-          <td class="border px-8 py-4">Dante Sparks</td>
-          <td class="border px-8 py-4">Italy</td>
-        </tr>
-      </table>
+      <div className="flex flex-col">
+        {result && result?.countries && !loading ? (
+          <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
+              <div className="overflow-hidden">
+                <table className="min-w-full text-center text-sm font-light">
+                  <thead className="border-b bg-neutral-800 font-medium text-white dark:border-neutral-500 dark:bg-neutral-900">
+                    <tr>
+                      <th scope="col" className=" px-6 py-4">
+                        #
+                      </th>
+                      <th scope="col" className=" px-6 py-4">
+                        Country Name
+                      </th>
+                      <th scope="col" className=" px-6 py-4">
+                        Code
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result?.countries &&
+                      currentResult?.map(function (value) {
+                        return (
+                          <tr>
+                            <td className="whitespace-nowrap  px-6 py-4 font-medium">
+                              {value?.index}
+                            </td>
+                            <td className="whitespace-nowrap  px-6 py-4">
+                              {value?.name}
+                            </td>
+                            <td className="whitespace-nowrap  px-6 py-4">
+                              {value?.code}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div
+            className="float-right inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+            role="status"
+          >
+            <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+              Loading...
+            </span>
+          </div>
+        )}
+      </div>
+      <Pagination
+        resultPerPage={resultPerPage}
+        totalPosts={result?.countries?.length}
+        paginate={paginate}
+        currentPage={currentPage}
+      />
     </div>
   );
 }
