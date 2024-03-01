@@ -6,10 +6,13 @@ import { useEffect, useState } from "react";
 import Pagination from "../components/pagination/page";
 
 const query = gql`
-  query {
-    countries {
+  query ListCountriesInNAFTA {
+    countries(filter: { code: { in: ["AD"] }, name: { in: ["Andorra"] } }) {
       code
       name
+      languages {
+        name
+      }
     }
   }
 `;
@@ -25,7 +28,7 @@ export default function List() {
     setResult(data);
     setLoading(false);
   }, [data]);
-
+  console.log(result, "resultPerPage");
   // Get current result
   const indexOfLastPost = currentPage * resultPerPage;
   const indexOfFirstPost = indexOfLastPost - resultPerPage;
@@ -93,6 +96,9 @@ export default function List() {
                       <th scope="col" className=" px-6 py-4">
                         Code
                       </th>
+                      <th scope="col" className=" px-6 py-4">
+                        Language name
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -108,6 +114,9 @@ export default function List() {
                             </td>
                             <td className="whitespace-nowrap  px-6 py-4">
                               {value?.code}
+                            </td>
+                            <td className="whitespace-nowrap  px-6 py-4">
+                              {value?.languages[0]?.name}
                             </td>
                           </tr>
                         );
