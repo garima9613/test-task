@@ -1,41 +1,43 @@
 "use client";
-import { gql } from "@apollo/client";
-import { useSuspenseQuery } from "@apollo/experimental-nextjs-app-support/ssr";
+import { useQuery } from "@apollo/client";
 import Header from "../components/header/page";
 import { useEffect, useState } from "react";
 import Pagination from "../components/pagination/page";
-
-const query = gql`
-  query ListCountriesInNAFTA {
-    countries(filter: { code: { in: ["AD"] }, name: { in: ["Andorra"] } }) {
-      code
-      name
-      languages {
-        name
-      }
-    }
-  }
-`;
+import {
+  GET_COUNTRIES,
+  GET_COUNTRIES_BY_FILTER,
+} from "../components/constants/page";
 
 export default function List() {
   const [result, setResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [resultPerPage] = useState(10);
-  const { data } = useSuspenseQuery(query);
+  const [searchFilter, setSearchFilter] = useState();
+
+  let data;
+  if (!searchFilter) {
+    data = useQuery(GET_COUNTRIES);
+  } else {
+    data = useQuery(GET_COUNTRIES_BY_FILTER, {
+      variables: { cName: searchFilter },
+    });
+  }
 
   useEffect(() => {
-    setResult(data);
+    setResult(data?.data);
     setLoading(false);
-  }, [data]);
-  console.log(result, "resultPerPage");
-  // Get current result
+  }, [data && data?.data]);
+
+  // Get current result based on filter/non-filter
   const indexOfLastPost = currentPage * resultPerPage;
   const indexOfFirstPost = indexOfLastPost - resultPerPage;
-  const currentResult = result?.countries?.slice(
-    indexOfFirstPost,
-    indexOfLastPost
-  );
+  let currentResult;
+  if (result?.countries?.length > 1) {
+    currentResult = result?.countries?.slice(indexOfFirstPost, indexOfLastPost);
+  } else {
+    currentResult = result?.countries;
+  }
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -47,18 +49,17 @@ export default function List() {
   return (
     <div className="container mx-auto mb-8 px-8">
       <Header />
+      {/* Search icon */}
       <div className="mb-3 xl:w-96">
         <div className="relative mb-4 flex w-full flex-wrap items-stretch">
           <input
-            type="search"
+            type="text"
+            onChange={(e) => setSearchFilter(e.target.value)}
             className="relative m-0 block flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
-            placeholder="Search"
+            placeholder="Search by Country Code (ex. AD,Br,AG etc)"
             aria-label="Search"
             aria-describedby="button-addon2"
           />
-
-          {/* Search icon */}
-
           <span
             className="input-group-text flex items-center whitespace-nowrap rounded px-3 py-1.5 text-center text-base font-normal text-neutral-700 dark:text-neutral-200"
             id="basic-addon2"

@@ -10,7 +10,7 @@ import {
 
 function makeClient() {
   const httpLink = new HttpLink({
-    // https://studio.apollographql.com/public/spacex-l4uc6p/
+    // uri: "https://current--spotify-demo-graph-1lfv9kv.apollographos.net/graphql",
     uri: "https://countries.trevorblades.com",
   });
 
@@ -28,9 +28,16 @@ function makeClient() {
   });
 }
 
+function makeSuspenseCache() {
+  return new SuspenseCache();
+}
+
 export function ApolloWrapper({ children }) {
   return (
-    <ApolloNextAppProvider makeClient={makeClient}>
+    <ApolloNextAppProvider
+      makeClient={makeClient}
+      makeSuspenseCache={makeSuspenseCache}
+    >
       {children}
     </ApolloNextAppProvider>
   );
