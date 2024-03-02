@@ -14,6 +14,7 @@ export default function List() {
   const [currentPage, setCurrentPage] = useState(1);
   const [resultPerPage] = useState(10);
   const [searchFilter, setSearchFilter] = useState();
+  const [currentResult, setCurrentResult] = useState([]);
 
   // calling query based on filter/non-filter
   let data;
@@ -26,22 +27,42 @@ export default function List() {
   }
 
   useEffect(() => {
+    setCurrentResult([]);
     setResult(data?.data);
     setLoading(false);
+    // Get current result based on filter/non-filter
+    const indexOfLastPost = currentPage * resultPerPage;
+    const indexOfFirstPost = indexOfLastPost - resultPerPage;
+    setCurrentResult(
+      data?.data?.countries?.slice(indexOfFirstPost, indexOfLastPost)
+    );
   }, [data && data?.data]);
 
-  // Get current result based on filter/non-filter
-  const indexOfLastPost = currentPage * resultPerPage;
-  const indexOfFirstPost = indexOfLastPost - resultPerPage;
-  let currentResult;
-  if (result?.countries?.length > 1) {
-    currentResult = result?.countries?.slice(indexOfFirstPost, indexOfLastPost);
-  } else {
-    currentResult = result?.countries;
-  }
-
   // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    const indexOfLastPost = pageNumber * resultPerPage;
+    const indexOfFirstPost = indexOfLastPost - resultPerPage;
+    setCurrentResult(
+      result.countries?.slice(indexOfFirstPost, indexOfLastPost)
+    );
+  };
+
+  // on change search input
+  const onSearchChange = (value) => {
+    setCurrentPage(1);
+    setSearchFilter(
+      // Capitalize first letter
+      value.charAt(0).toUpperCase() + value.slice(1)
+    );
+    setCurrentResult([]);
+    const indexOfLastPost = currentPage * resultPerPage;
+    const indexOfFirstPost = indexOfLastPost - resultPerPage;
+    setCurrentResult(
+      result?.countries?.slice(indexOfFirstPost, indexOfLastPost)
+    );
+  };
+
   const pageNumbers = [];
   for (let i = 1; i <= Math.ceil(result?.countries / resultPerPage); i++) {
     pageNumbers.push(i);
@@ -55,12 +76,7 @@ export default function List() {
         <div className="relative mb-4 flex w-full flex-wrap items-stretch">
           <input
             type="text"
-            onChange={(e) =>
-              setSearchFilter(
-                // Capitalize first letter
-                e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1)
-              )
-            }
+            onChange={(e) => onSearchChange(e?.target?.value)}
             className="relative m-0 block flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
             placeholder="Search by Country Name"
             aria-label="Search"
@@ -87,7 +103,7 @@ export default function List() {
       </div>
 
       <div className="flex flex-col">
-        {result && result?.countries && !loading ? (
+        {currentResult && !loading ? (
           <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
               <div className="overflow-hidden">
