@@ -92,23 +92,23 @@ export default function List() {
                         #
                       </th>
                       <th scope="col" className=" px-6 py-4">
-                        Country Name
+                        Country
                       </th>
                       <th scope="col" className=" px-6 py-4">
                         Code
                       </th>
                       <th scope="col" className=" px-6 py-4">
-                        Language name
+                        Language
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {result?.countries &&
-                      currentResult?.map(function (value) {
+                      currentResult?.map(function (value, index) {
                         return (
                           <tr>
                             <td className="whitespace-nowrap  px-6 py-4 font-medium">
-                              {value?.index}
+                              {index + 1}
                             </td>
                             <td className="whitespace-nowrap  px-6 py-4">
                               {value?.name}
