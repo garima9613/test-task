@@ -35,7 +35,7 @@ export default function Pagination({
               onClick={() => {
                 paginate(currentPage - 1);
               }}
-              className="relative block rounded-full bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+              className="relative block rounded-full bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 dark:text-white"
               href="#"
             >
               Previous
@@ -64,7 +64,7 @@ export default function Pagination({
                 paginate(currentPage + 1);
               }}
               href="#"
-              className="relative block rounded-full bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+              className="relative block rounded-full bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300"
             >
               Next
             </a>

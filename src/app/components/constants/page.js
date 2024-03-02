@@ -14,7 +14,7 @@ const GET_COUNTRIES = gql`
 
 const GET_COUNTRIES_BY_FILTER = gql`
   query ListCountries($cName: String!) {
-    countries(filter: { code: { in: [$cName] } }) {
+    countries(filter: { name: { in: [$cName] } }) {
       code
       name
       languages {
