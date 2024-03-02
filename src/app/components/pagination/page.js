@@ -8,6 +8,7 @@ export default function Pagination({
 }) {
   const pageNumbers = [];
 
+  // for showing page numbers
   for (let i = 1; i <= Math.ceil(totalPosts / resultPerPage); i++) {
     pageNumbers.push(i);
   }

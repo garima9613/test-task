@@ -21,6 +21,7 @@ export default function Page() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // saving contact form data into local storage
     localStorage.setItem(
       "save-contact-info",
       JSON.stringify(contactUsFieldsState)

@@ -15,12 +15,13 @@ export default function List() {
   const [resultPerPage] = useState(10);
   const [searchFilter, setSearchFilter] = useState();
 
+  // calling query based on filter/non-filter
   let data;
-  if (!searchFilter) {
+  if (!searchFilter || searchFilter === "") {
     data = useQuery(GET_COUNTRIES);
   } else {
     data = useQuery(GET_COUNTRIES_BY_FILTER, {
-      variables: { cName: searchFilter },
+      variables: { cName: `${searchFilter}` },
     });
   }
 
@@ -56,6 +57,7 @@ export default function List() {
             type="text"
             onChange={(e) =>
               setSearchFilter(
+                // Capitalize first letter
                 e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1)
               )
             }
@@ -107,25 +109,24 @@ export default function List() {
                     </tr>
                   </thead>
                   <tbody>
-                    {result?.countries &&
-                      currentResult?.map(function (value, index) {
-                        return (
-                          <tr>
-                            <td className="whitespace-nowrap  px-6 py-4 font-medium">
-                              {index + 1}
-                            </td>
-                            <td className="whitespace-nowrap  px-6 py-4">
-                              {value?.name}
-                            </td>
-                            <td className="whitespace-nowrap  px-6 py-4">
-                              {value?.code}
-                            </td>
-                            <td className="whitespace-nowrap  px-6 py-4">
-                              {value?.languages[0]?.name}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                    {currentResult?.map(function (value, index) {
+                      return (
+                        <tr>
+                          <td className="whitespace-nowrap  px-6 py-4 font-medium">
+                            {index + 1}
+                          </td>
+                          <td className="whitespace-nowrap  px-6 py-4">
+                            {value?.name}
+                          </td>
+                          <td className="whitespace-nowrap  px-6 py-4">
+                            {value?.code}
+                          </td>
+                          <td className="whitespace-nowrap  px-6 py-4">
+                            {value?.languages[0]?.name}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
